@@ -1,0 +1,66 @@
+/My Library
+├── .gitignore
+├── .venv/
+│   ├── .gitignore
+│   ├── Include/
+│   ├── Lib/
+│   ├── pyvenv.cfg
+│   └── Scripts/
+├── .vscode/
+│   └── tasks.json
+├── app.py
+├── config.py
+├── filestructure.txt
+├── requirements.txt
+├── venv/
+│   ├── .gitignore
+│   ├── Include/
+│   ├── Lib/
+│   ├── pyvenv.cfg
+│   └── Scripts/
+├── __pycache__/
+│   └── config.cpython-313.pyc
+└── app/
+    ├── __init__.py
+    ├── extensions.py
+    ├── models.py
+    ├── __pycache__/
+    │   ├── __init__.cpython-313.pyc
+    │   ├── extensions.cpython-313.pyc
+    │   └── models.cpython-313.pyc
+    ├── blueprints/
+    │   ├── book/
+    │   │   ├── __init__.py
+    │   │   ├── routes.py
+    │   │   ├── schemas.py
+    │   │   └── __pycache__/
+    │   │       ├── __init__.cpython-313.pyc
+    │   │       ├── routes.cpython-313.pyc
+    │   │       └── schemas.cpython-313.pyc
+    │   ├── loan/
+    │   │   ├── __init__.py
+    │   │   ├── routes.py
+    │   │   ├── schemas.py
+    │   │   └── __pycache__/
+    │   │       ├── __init__.cpython-313.pyc
+    │   │       ├── routes.cpython-313.pyc
+    │   │       └── schemas.cpython-313.pyc
+    │   └── member/
+    │       ├── __init__.py
+    │       ├── routes.py
+    │       ├── schemas.py
+    │       └── __pycache__/
+    │           ├── __init__.cpython-313.pyc
+    │           ├── routes.cpython-313.pyc
+    │           └── schemas.cpython-313.pyc
+    ├── static/
+    │   └── swagger.yaml
+    ├── tests/
+    │   ├── test_book.py
+    │   ├── test_loan.py
+    │   ├── test_member.py
+    │   └── __pycache__/
+    └── utils/
+        ├── utils.py
+        └── __pycache__/
+            └── utils.cpython-313.pyc
