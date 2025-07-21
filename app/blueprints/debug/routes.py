@@ -1,3 +1,5 @@
+# Debug routes for development
+
 from flask import jsonify
 from . import debug_bp
 from app.models import db, Member, Book, Loan
@@ -5,13 +7,10 @@ from faker import Faker
 import random
 from datetime import date
 
-# curl -X POST http://127.0.0.1:5000/debug/seed-database
-
 
 @debug_bp.route("/seed-database", methods=["POST"])
 def seed_database():
-    """Clear existing data and seed the database with fake data."""
-    # Clear existing data by deleting from the association table first
+    # Clear existing data and seed database with fake data for testing
     loan_book_table = db.metadata.tables["loan_book"]
     db.session.execute(loan_book_table.delete())
 
@@ -24,7 +23,7 @@ def seed_database():
     members = []
     books = []
 
-    # Create 100 members
+    # Create 100 fake members
     for _ in range(100):
         member = Member(
             name=faker.name(),
@@ -35,7 +34,7 @@ def seed_database():
         members.append(member)
         db.session.add(member)
 
-    # Create 100 books
+    # Create 100 fake books
     for _ in range(100):
         book = Book(
             title=faker.catch_phrase(),
@@ -50,13 +49,12 @@ def seed_database():
 
     db.session.commit()
 
-    # Create 100 loans
+    # Create 100 fake loans
     for _ in range(100):
         loan = Loan(
             member_id=random.choice(members).id,
             loan_date=faker.date_between(start_date="-2y", end_date="today"),
         )
-        # Add 1 to 3 books to the loan
         num_books = random.randint(1, 3)
         loaned_books = random.sample(books, num_books)
         loan.books.extend(loaned_books)

@@ -1,3 +1,7 @@
+# Unit Tests for Member Management Functionality
+# This module contains comprehensive test cases for member-related operations
+# including authentication, CRUD operations, and API endpoint validation.
+
 from app import create_app
 from app.models import db, Member
 from datetime import datetime
@@ -6,23 +10,45 @@ import unittest
 
 
 class TestMember(unittest.TestCase):
+    """
+    Test suite for Member model and API endpoints.
+    Tests member registration, authentication, profile management, and data validation.
+    """
+
     def setUp(self):
+        """
+        Set up test environment before each test case.
+        Creates a test application, initializes a clean database,
+        and creates a test member for authentication testing.
+        """
+        # Create test application with testing configuration
         self.app = create_app("TestingConfig")
+
+        # Create a test member for use in test cases
         self.member = Member(
             name="test_user",
             email="test@email.com",
             DOB=datetime.strptime("1900-01-01", "%Y-%m-%d").date(),
             password="test",
         )
+
+        # Set up clean database and add test member
         with self.app.app_context():
-            db.drop_all()
-            db.create_all()
+            db.drop_all()  # Remove all existing tables
+            db.create_all()  # Create fresh database schema
             db.session.add(self.member)
             db.session.commit()
+            # Generate authentication token for protected endpoint testing
             self.token = encode_token(1)
+
+        # Create test client for making HTTP requests
         self.client = self.app.test_client()
 
     def test_login_member(self):
+        """
+        Test member authentication with valid credentials.
+        Verifies that login endpoint returns success response and auth token.
+        """
         credentials = {"email": "test@email.com", "password": "test"}
 
         response = self.client.post("/members/login", json=credentials)
@@ -69,9 +95,7 @@ class TestMember(unittest.TestCase):
         )
 
     def test_update_member(self):
-        update_payload = {
-            "name": "Peter"
-        }
+        update_payload = {"name": "Peter"}
 
         token = self.test_login_member()
         headers = {"Authorization": "Bearer " + token}

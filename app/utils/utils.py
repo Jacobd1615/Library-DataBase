@@ -1,25 +1,33 @@
+# JWT authentication utilities
+
 from datetime import datetime, timedelta, timezone
 from jose import jwt
 import jose
 from functools import wraps
 from flask import request, jsonify, current_app
+import os
+
+SECRET_KEY = os.environ.get("SECRET_KEY") or "super secret secrets"
 
 
 def token_required(f):
+    """Decorator to protect routes with JWT token validation."""
+
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
+
         if "Authorization" in request.headers:
             token = request.headers["Authorization"].split(" ")[1]
 
         if not token:
             return jsonify({"messages": "Token is missing"}), 401
+
         try:
-            # Decode the token to get the user information
             data = jwt.decode(
                 token, current_app.config["SECRET_KEY"], algorithms=["HS256"]
             )
-            member_id = data["sub"]  # Extract user ID from token
+            member_id = data["sub"]
 
         except jose.exceptions.ExpiredSignatureError:
             return jsonify({"messages": "Token has expired"}), 401
@@ -31,15 +39,13 @@ def token_required(f):
     return decorated
 
 
-def encode_token(user_id):  # Encode a JWT token with an expiration time
+def encode_token(user_id):
+    """Generate JWT token for user authentication."""
     payload = {
-        "exp": datetime.now(timezone.utc)
-        + timedelta(days=0, hours=1),  # Expiration time
-        "iat": datetime.now(timezone.utc),  # Issued at time
-        "sub": str(user_id),  # Subject (user ID)
+        "exp": datetime.now(timezone.utc) + timedelta(days=0, hours=1),
+        "iat": datetime.now(timezone.utc),
+        "sub": str(user_id),
     }
 
-    token = jwt.encode(
-        payload, current_app.config["SECRET_KEY"], algorithm="HS256"
-    )  # Encode the payload into a JWT token
+    token = jwt.encode(payload, current_app.config["SECRET_KEY"], algorithm="HS256")
     return token

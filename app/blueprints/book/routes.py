@@ -1,3 +1,5 @@
+# Book management routes
+
 from .schemas import book_schema, books_schema
 from flask import request, jsonify
 from marshmallow import ValidationError
@@ -7,13 +9,14 @@ from . import book_bp
 from app.extensions import cache, limiter
 
 
-# Route to create a new book
 @book_bp.route("/", methods=["POST"])
 @limiter.limit("100/day;20/hour;5/minute")
 def create_book():
+    # Create a new book in the library collection
     json_data = request.get_json()
     if not json_data:
         return jsonify({"Error": "Request body must be JSON"}), 400
+
     try:
         new_book = book_schema.load(json_data)
     except ValidationError as e:
@@ -25,11 +28,11 @@ def create_book():
     return book_schema.jsonify(new_book), 201
 
 
-# Route to get all books
 @book_bp.route("/", methods=["GET"])
 @limiter.limit("100/day;20/hour;5/minute")
-@cache.cached(timeout=60)  # Cache the response for 60 seconds
+@cache.cached(timeout=60)
 def get_books():
+    # Retrieve all books with optional pagination
     try:
         page = int(request.args.get("page"))
         per_page = int(request.args.get("per_page"))
@@ -42,21 +45,21 @@ def get_books():
         return books_schema.jsonify(books), 200
 
 
-# Route to get a specific book by ID
 @book_bp.route("/<int:book_id>", methods=["GET"])
 @limiter.limit("100/day;20/hour;5/minute")
-@cache.cached(timeout=60)  # Cache the response for 60 seconds
+@cache.cached(timeout=60)
 def get_book(book_id):
+    # Retrieve a specific book by ID
     book = db.session.get(Book, book_id)
     if book:
         return book_schema.jsonify(book), 200
     return jsonify({"message": "Book not found"}), 404
 
 
-# Route to update a book by ID
 @book_bp.route("/<int:book_id>", methods=["PUT"])
 @limiter.limit("100/day;20/hour;5/minute")
 def update_book(book_id):
+    # Update an existing book's information
     query = select(Book).where(Book.id == book_id)
     book = db.session.execute(query).scalars().first()
 
@@ -66,8 +69,8 @@ def update_book(book_id):
     json_data = request.get_json()
     if not json_data:
         return jsonify({"Error": "Request body must be JSON"}), 400
+
     try:
-        # Validate the data
         book_schema.load(json_data, partial=True)
     except ValidationError as e:
         return jsonify({"Error": e.messages}), 400
@@ -80,10 +83,10 @@ def update_book(book_id):
     return book_schema.jsonify(book), 200
 
 
-# Route to delete a book by ID
 @book_bp.route("/<int:book_id>", methods=["DELETE"])
 @limiter.limit("100/day;20/hour;5/minute")
 def delete_book(book_id):
+    # Delete a book from the library collection
     query = select(Book).where(Book.id == book_id)
     book = db.session.execute(query).scalars().first()
 
@@ -98,6 +101,7 @@ def delete_book(book_id):
 @book_bp.route("/popular", methods=["GET"])
 @limiter.limit("100/day;20/hour;5/minute")
 def popluar_books():
+    # Retrieve books sorted by popularity (number of loans)
     query = select(Book)
     books = list(db.session.execute(query).scalars().all())
 
@@ -108,6 +112,7 @@ def popluar_books():
 
 @book_bp.route("/search", methods=["GET"])
 def search_book():
+    # Search for books by title
     title = request.args.get("title")
 
     query = select(Book).where(Book.title.like(f"%{title}%"))
