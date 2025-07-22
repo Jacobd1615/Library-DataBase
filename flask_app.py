@@ -14,11 +14,10 @@ app = create_app("ProductionConfig")
 # Initialize database tables only if they don't exist
 with app.app_context():
     # Check if tables exist before creating
-
     inspector = inspect(db.engine)
     if not inspector.has_table("members"):
         # db.drop_all()
         db.create_all()
-        print("Database tables created successfully!")
+        print("✅ Database tables created successfully!")
     else:
-        print("Database tables already exist - skipping creation")
+        print("ℹ️ Database tables already exist - skipping creation")
