@@ -1,9 +1,10 @@
 swagger: "2.0"
 info:
-  title: "Library Database"
-  description: "This is a library api"
-  version: "1.0.1"
+  title: "Library Database API"
+  description: "This is a library management api - Updated January 2025"
+  version: "2.0.0"
 host: "library-database-ja0b.onrender.com"
+basePath: "/"
 schemes:
   - "https"
 consumes:
