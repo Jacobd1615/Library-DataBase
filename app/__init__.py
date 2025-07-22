@@ -11,10 +11,12 @@ from flask_swagger_ui import get_swaggerui_blueprint
 
 # Swagger configuration
 SWAGGER_URL = "/api/docs"
-API_URL = "/static/swagger.yaml"
+API_URL = "/static/swagger.yaml?v=2.0.0"
 
 swaggerui_blueprint = get_swaggerui_blueprint(
-    SWAGGER_URL, API_URL, config={"app_name": "library_db"}
+    SWAGGER_URL,
+    API_URL,
+    config={"app_name": "library_db", "dom_id": "#swagger-ui", "layout": "BaseLayout"},
 )
 
 
