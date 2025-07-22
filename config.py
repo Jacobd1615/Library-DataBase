@@ -26,5 +26,8 @@ class ProductionConfig:
     """Configuration for production environment."""
 
     SECRET_KEY = os.environ.get("SECRET_KEY") or "super secret secrets"
-    SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
+    SQLALCHEMY_DATABASE_URI = (
+        os.environ.get("SQLALCHEMY_DATABASE_URI")
+        or "mysql+mysqlconnector://root:240179@localhost/library_db"
+    )
     CACHE_TYPE = "SimpleCache"
