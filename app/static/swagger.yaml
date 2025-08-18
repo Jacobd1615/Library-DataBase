@@ -1,0 +1,707 @@
+swagger: "2.0"
+info:
+  title: "Library Database"
+  description: "This is a library api"
+  version: "1.0.0"
+host: "127.0.0.1:5000"
+schemes:
+  - "http"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+securityDefinitions:
+  bearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+
+# =================================================================================================================================================
+
+# Endpoints
+paths:
+  # Loan Endpoint
+  /loans:
+    post:
+      tags:
+        - Loans
+      summary: "Create a new loan"
+      description: "Endpoint to create a new loan with books for a member"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Information required to create a new Loan"
+          required: true
+          schema:
+            $ref: "#/definitions/CreateLoanPayload"
+      responses:
+        201:
+          description: "Successful Loan Creation"
+          schema:
+            $ref: "#/definitions/CreateLoanResponse"
+          examples:
+            application/json:
+              id: 1
+              loan_date: "2025-01-18"
+              member_id: 1
+              books:
+                - id: 1
+                  title: "IT"
+                  author: "Stephen King"
+                - id: 2
+                  title: "Harry Potter"
+                  author: "J.K. Rowling"
+
+    get:
+      tags:
+        - Loans
+      summary: "Returns all Loans"
+      description: "Endpoint to retrieve a list of all loans"
+      responses:
+        200:
+          description: "Retrieved Loans Successfully"
+          schema:
+            $ref: "#/definitions/AllLoans"
+
+  /loans/{loan_id}:
+    get:
+      tags:
+        - Loans
+      summary: "Get a specific loan"
+      description: "Endpoint to retrieve a specific loan by ID"
+      parameters:
+        - in: "path"
+          name: "loan_id"
+          description: "ID of the loan to retrieve"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Retrieved Loan Successfully"
+          schema:
+            $ref: "#/definitions/CreateLoanResponse"
+        404:
+          description: "Loan not found"
+          schema:
+            type: "object"
+            properties:
+              error:
+                type: "string"
+          examples:
+            application/json:
+              error: "Loan not found"
+
+    put:
+      tags:
+        - Loans
+      summary: "Update a loan by adding/removing books"
+      description: "Endpoint to add or remove books from an existing loan"
+      parameters:
+        - in: "path"
+          name: "loan_id"
+          description: "ID of the loan to update"
+          required: true
+          type: "integer"
+        - in: "body"
+          name: "body"
+          description: "Book IDs to add or remove from the loan"
+          required: true
+          schema:
+            $ref: "#/definitions/EditLoanPayload"
+      responses:
+        200:
+          description: "Loan Successfully Updated"
+          schema:
+            $ref: "#/definitions/CreateLoanResponse"
+          examples:
+            application/json:
+              id: 1
+              loan_date: "2025-01-18"
+              member_id: 1
+              books:
+                - id: 1
+                  title: "IT"
+                  author: "Stephen King"
+                - id: 3
+                  title: "New Book"
+                  author: "New Author"
+
+    delete:
+      tags:
+        - Loans
+      summary: "Delete a loan"
+      description: "Endpoint to delete a loan by ID"
+      parameters:
+        - in: "path"
+          name: "loan_id"
+          description: "ID of the loan to delete"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Successfully Deleted Loan"
+          schema:
+            $ref: "#/definitions/DeleteLoanResponse"
+          examples:
+            application/json:
+              message: "Loan id: 1 deleted successfully"
+        404:
+          description: "Loan not found"
+          schema:
+            type: "object"
+            properties:
+              error:
+                type: "string"
+          examples:
+            application/json:
+              error: "Loan not found"
+
+  # Book Endpoint
+  /books:
+    post:
+      tags:
+        - Books
+      summary: "Endpoint to create/register a new book"
+      description: "Endpoint to create a new book in our library system, emails must be unique"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Information required to create a new Book"
+          required: true
+          schema:
+            $ref: "#/definitions/CreateBookPayload"
+      responses:
+        201:
+          description: "Successful Book Creation"
+          schema:
+            $ref: "#/definitions/CreateBookResponse"
+          examples:
+            application/json:
+              id: 1
+              author: Jake
+              genre: Horror
+              desc: Description of book
+              title: Bootleg is the best
+
+    get:
+      tags:
+        - Books
+      summary: "Returns all Books"
+      description: "Endpoint to retrieve a list of all books"
+      responses:
+        200:
+          description: "Retrieved Books Sucessfully"
+          schema:
+            $ref: "#/definitions/AllBooks"
+
+  /books/popular:
+    get:
+      tags:
+        - Books
+      summary: "Returns books sorted by popularity"
+      description: "Endpoint to retrieve books sorted by most loaned (most popular first)"
+      responses:
+        200:
+          description: "Retrieved Popular Books Successfully"
+          schema:
+            $ref: "#/definitions/AllBooks"
+          examples:
+            application/json:
+              - id: 1
+                author: "Stephen King"
+                genre: "Horror"
+                desc: "A scary book"
+                title: "IT"
+              - id: 2
+                author: "J.K. Rowling"
+                genre: "Fantasy"
+                desc: "A wizard book"
+                title: "Harry Potter"
+
+  /books/search:
+    get:
+      tags:
+        - Books
+      summary: "Search books by title"
+      description: "Endpoint to search for books by title using query parameters"
+      parameters:
+        - in: "query"
+          name: "title"
+          description: "Title or partial title to search for"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Retrieved Books Successfully"
+          schema:
+            $ref: "#/definitions/AllBooks"
+          examples:
+            application/json:
+              - id: 1
+                author: "Stephen King"
+                genre: "Horror"
+                desc: "A scary book"
+                title: "IT"
+
+  /books/{book_id}:
+    put:
+      tags:
+        - Books
+      summary: "Endpoint to update a book"
+      description: "Endpoint to update a specific book by ID"
+      parameters:
+        - in: "path"
+          name: "book_id"
+          description: "ID of the book to update"
+          required: true
+          type: "integer"
+        - in: "body"
+          name: "body"
+          description: "Information required to update a Book"
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateBookPayload"
+      responses:
+        200:
+          description: "Book Sucessfully Updated"
+          schema:
+            $ref: "#/definitions/UpdateBookResponse"
+          examples:
+            application/json:
+              id: 1
+              author: Dohn Joe
+              genre: Comedy
+              desc: Book content
+              title: A pig that can fly
+
+    delete:
+      tags:
+        - Books
+      summary: "Deletes a book"
+      description: "Endpoint to delete a book. [additional info]"
+      parameters:
+        - in: "path"
+          name: "book_id"
+          description: "ID of the book to delete"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Successfully Deleted Book"
+          schema:
+            $ref: "#/definitions/DeleteBookResponse"
+          examples:
+            application/json:
+              message: "Successfully deleted book <book_id>"
+
+  # Member Endpoint
+  /members/login:
+    post:
+      tags:
+        - Members
+      summary: "Login endpoint, (generates token)"
+      description: "Validates member credentials, generates and return a member specific token"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Login Credentials"
+          required: true
+          schema:
+            $ref: "#/definitions/LoginCredentials"
+      responses:
+        200:
+          description: "Login sucessful"
+          schema:
+            $ref: "#/definitions/LoginResponse"
+
+  /members:
+    post:
+      tags:
+        - Members
+      summary: "Endpoint to create/register a new user"
+      description: "Endpoint to create a new member in our library system, emails must be unique"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Information required to create a new Members"
+          required: true
+          schema:
+            $ref: "#/definitions/CreateMemberPayload"
+      responses:
+        201:
+          description: "Successfull Member Creation"
+          schema:
+            $ref: "#/definitions/CreateMemberResponse"
+          examples:
+            application/json:
+              id: 1
+              name: John Doe
+              DOB: "1900-01-01"
+              email: example@example.com
+              password: password123
+
+    get:
+      tags:
+        - Members
+      summary: "Returns all Members"
+      description: "Endpoint to retrieve a list of all members"
+      responses:
+        200:
+          description: "Retrieved Members Sucessfully"
+          schema:
+            $ref: "#/definitions/AllMembers"
+
+    put:
+      tags:
+        - Members
+      summary: "Endpoint to update a user"
+      description: "Endpoint to update a member, this is a token authenticated route, and the user must be logged in to update their account"
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Information required to update a Member"
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateMemberPayload"
+      responses:
+        200:
+          description: "Successfully Updated member"
+          schema:
+            $ref: "#/definitions/UpdateMemberResponse"
+          examples:
+            application/json:
+              id: 1
+              name: Dohn Joe
+              DOB: "1900-01-01"
+              email: dohnj@email.com
+              password: password123
+
+    delete:
+      tags:
+        - Members
+      summary: "Deletes a member"
+      description: "Endpoint to delete a member. Requires token authentication, member must be logged in to delete their account"
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: "Successfully Deleted member"
+          schema:
+            $ref: "#/definitions/DeleteMemberResponse"
+          examples:
+            application/json:
+              message: "Successfully deleted user <member_id>"
+
+# =================================================================================================================================================
+definitions:
+  # Login Credentials
+
+  LoginCredentials:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      password:
+        type: "string"
+    required:
+      - email
+      - password
+
+  LoginResponse:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+      message:
+        type: "string"
+      status:
+        type: "string"
+
+  #Books
+
+  CreateBookPayload:
+    type: "object"
+    properties:
+      author:
+        type: "string"
+      genre:
+        type: "string"
+      desc:
+        type: "string"
+      title:
+        type: "string"
+    required:
+      - author
+      - genre
+      - desc
+      - title
+
+  CreateBookResponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      author:
+        type: "string"
+      genre:
+        type: "string"
+      desc:
+        type: "string"
+      title:
+        type: "string"
+
+  AllBooks:
+    type: "array"
+    items:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        author:
+          type: "string"
+        genre:
+          type: "string"
+        desc:
+          type: "string"
+        title:
+          type: "string"
+
+  UpdateBookPayload:
+    type: "object"
+    properties:
+      author:
+        type: "string"
+      genre:
+        type: "string"
+      desc:
+        type: "string"
+      title:
+        type: "string"
+
+  UpdateBookResponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      author:
+        type: "string"
+      genre:
+        type: "string"
+      desc:
+        type: "string"
+      title:
+        type: "string"
+
+  DeleteBookResponse:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+
+  #Members
+
+  CreateMemberPayload:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      email:
+        type: "string"
+      DOB:
+        type: "string"
+        format: "date"
+      password:
+        type: "string"
+    required:
+      - name
+      - email
+      - DOB
+      - password
+
+  CreateMemberResponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      email:
+        type: "string"
+      DOB:
+        type: "string"
+      password:
+        type: "string"
+
+  AllMembers:
+    type: "array"
+    items:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        name:
+          type: "string"
+        email:
+          type: "string"
+        DOB:
+          type: "string"
+        password:
+          type: "string"
+
+  UpdateMemberPayload:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      email:
+        type: "string"
+      DOB:
+        type: "string"
+        format: "date"
+      password:
+        type: "string"
+
+  UpdateMemberResponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      email:
+        type: "string"
+      DOB:
+        type: "string"
+      password:
+        type: "string"
+
+  DeleteMemberResponse:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+
+  # Loans
+
+  CreateLoanPayload:
+    type: "object"
+    properties:
+      loan_date:
+        type: "string"
+        format: "date"
+      member_id:
+        type: "integer"
+      book_ids:
+        type: "array"
+        items:
+          type: "integer"
+    required:
+      - loan_date
+      - member_id
+      - book_ids
+
+  CreateLoanResponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      loan_date:
+        type: "string"
+      member_id:
+        type: "integer"
+      books:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            id:
+              type: "integer"
+            title:
+              type: "string"
+            author:
+              type: "string"
+
+  AllLoans:
+    type: "array"
+    items:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        loan_date:
+          type: "string"
+        member_id:
+          type: "integer"
+        books:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+              title:
+                type: "string"
+              author:
+                type: "string"
+
+  UpdateLoanPayload:
+    type: "object"
+    properties:
+      loan_date:
+        type: "string"
+        format: "date"
+      member_id:
+        type: "integer"
+      book_ids:
+        type: "array"
+        items:
+          type: "integer"
+    required:
+      - loan_date
+      - member_id
+      - book_ids
+
+  EditLoanPayload:
+    type: "object"
+    properties:
+      add_book_ids:
+        type: "array"
+        items:
+          type: "integer"
+        description: "Array of book IDs to add to the loan"
+      remove_book_ids:
+        type: "array"
+        items:
+          type: "integer"
+        description: "Array of book IDs to remove from the loan"
+    description: "At least one of add_book_ids or remove_book_ids must be provided"
+
+  DeleteLoanResponse:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+
+  UpdateLoanResponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      loan_date:
+        type: "string"
+      member_id:
+        type: "integer"
+      books:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            id:
+              type: "integer"
+            title:
+              type: "string"
+            author:
+              type: "string"
