@@ -3,9 +3,6 @@ info:
   title: "Library Database"
   description: "This is a library api"
   version: "1.0.0"
-host: "127.0.0.1:5000"
-schemes:
-  - "http"
 consumes:
   - "application/json"
 produces:

@@ -6,6 +6,7 @@ from .blueprints.book import book_bp
 from .blueprints.loan import loan_bp
 from .blueprints.debug import debug_bp
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask_cors import CORS
 
 
 SWAGGER_URL ='/api/docs'
@@ -28,6 +29,7 @@ def create_app(config_name):
     db.init_app(app)
     limiter.init_app(app)
     cache.init_app(app)
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
     # initialize blueprints
     app.register_blueprint(member_bp, url_prefix="/members")
