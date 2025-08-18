@@ -3,6 +3,7 @@ info:
   title: "Library Database"
   description: "This is a library api"
   version: "1.0.0"
+basePath: "/"
 consumes:
   - "application/json"
 produces:
