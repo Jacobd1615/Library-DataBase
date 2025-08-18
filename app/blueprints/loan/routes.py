@@ -8,7 +8,7 @@ from app.extensions import limiter
 
 
 # Create a new loan
-@loan_bp.route("/", methods=["POST"])
+@loan_bp.route("", methods=["POST"])
 @limiter.limit("100/day;20/hour;5/minute")
 def create_loan():
     json_data = request.get_json()
@@ -39,7 +39,7 @@ def create_loan():
 
 
 # Get all loans
-@loan_bp.route("/", methods=["GET"])
+@loan_bp.route("", methods=["GET"])
 @limiter.limit("100/day;20/hour;5/minute")
 def get_loans():
     query = select(Loan)

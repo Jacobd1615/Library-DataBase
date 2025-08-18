@@ -8,7 +8,7 @@ from app.extensions import cache, limiter
 
 
 # Route to create a new book
-@book_bp.route("/", methods=["POST"])
+@book_bp.route("", methods=["POST"])
 @limiter.limit("100/day;20/hour;5/minute")
 def create_book():
     json_data = request.get_json()
@@ -26,13 +26,17 @@ def create_book():
 
 
 # Route to get all books
-@book_bp.route("/", methods=["GET"])
+@book_bp.route("", methods=["GET"])
 @limiter.limit("100/day;20/hour;5/minute")
 @cache.cached(timeout=60)  # Cache the response for 60 seconds
 def get_books():
     try:
-        page = int(request.args.get("page"))
-        per_page = int(request.args.get("per_page"))
+        page_raw = request.args.get("page", "1")
+        per_page_raw = request.args.get("per_page", "10")
+        page = int(page_raw)
+        per_page = int(per_page_raw)
+        if page < 1 or per_page < 1:
+            raise ValueError
         query = select(Book)
         books = db.paginate(query, page=page, per_page=per_page)
         return books_schema.jsonify(books.items), 200

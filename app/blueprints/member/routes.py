@@ -27,7 +27,7 @@ def login_member():
 
     # Check if the member exists and the password is correct
     if member and member.password == credentials["password"]:
-    
+
         auth_token = encode_token(member.id)
 
         response = {
@@ -42,7 +42,7 @@ def login_member():
 
 
 # Define the route for creating a new member via POST request
-@member_bp.route("/", methods=["POST"])
+@member_bp.route("", methods=["POST"])
 @limiter.limit("10 per hour")  # Limit to 3 requests per hour per IP address
 def create_member():
     # Ensure the request contains JSON data
@@ -70,7 +70,7 @@ def create_member():
 
 
 # Get all members
-@member_bp.route("/", methods=["GET"])
+@member_bp.route("", methods=["GET"])
 @limiter.limit("100/day;20/hour;5/minute")
 @cache.cached(timeout=60)  # Cache the response for 60 seconds
 def get_members():
@@ -93,7 +93,7 @@ def get_member(member_id):
 
 
 # Update a member using their ID from token
-@member_bp.route("/", methods=["PUT"])
+@member_bp.route("", methods=["PUT"])
 @limiter.limit("100/day;20/hour;5/minute")
 @token_required
 def update_member(token_member_id):
@@ -121,7 +121,7 @@ def update_member(token_member_id):
 
 
 # Delete a member using their ID from token
-@member_bp.route("/", methods=["DELETE"])
+@member_bp.route("", methods=["DELETE"])
 @token_required
 def delete_member(requester_id):
     member = db.session.get(Member, int(requester_id))
